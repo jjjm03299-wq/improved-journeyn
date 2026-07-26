@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VPN Manager - API Frontend & Dashboard</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #eef2ff;
+            --success: #10b981;
+            --success-bg: #ecfdf5;
+            --danger: #ef4444;
+            --danger-bg: #fef2f2;
+            --warning: #f59e0b;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --radius-lg: 12px;
+            --radius-md: 8px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            min-height: 100vh;
+            padding: 24px 16px;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        /* Header Styling */
+        header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 24px;
+            margin-bottom: 28px;
+            border-bottom: 1px solid #1e293b;
+            gap: 16px;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-brand h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.02em;
+        }
+
+        .header-brand p {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .mode-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            background-color: rgba(79, 70, 229, 0.15);
+            color: #818cf8;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--success);
+            box-shadow: 0 0 8px var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Nav Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            padding: 10px 16px;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            color: #f8fafc;
+            background-color: #1e293b;
+        }
+
+        .tab-btn.active {
+            color: #ffffff;
+            background-color: var(--primary);
+        }
+
+        /* Tab Content Grid */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        /* Card Component */
+        .card {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: #475569;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-count {
+            background-color: #334155;
+            color: #cbd5e1;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        /* Status Banner */
+        .status-box {
+            padding: 18px;
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+            border-left: 4px solid var(--danger);
+            background-color: rgba(239, 68, 68, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .status-box.connected {
+            border-left-color: var(--success);
+            background-color: rgba(16, 185, 129, 0.1);
+        }
+
+        .status-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-title.connected { color: #34d399; }
+        .status-title.disconnected { color: #f87171; }
+
+        .status-sub {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+            font-size: 0.875rem;
+        }
+
+        .meta-item {
+            background-color: #0f172a;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            border: 1px solid #334155;
+        }
+
+        .meta-label {
+            color: #64748b;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+        }
+
+        .meta-value {
+            color: #f1f5f9;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        /* Action Buttons */
+        .btn {
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 0.9375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-danger {
+            background-color: #dc2626;
+            color: #ffffff;
+        }
+
+        .btn-danger:hover {
+            background-color: #b91c1c;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #475569;
+            color: #e2e8f0;
+        }
+
+        .btn-outline:hover {
+            background-color: #334155;
+            color: #ffffff;
+        }
+
+        /* Scrollable Lists */
+        .item-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 420px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .item-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .item-list::-webkit-scrollbar-thumb {
+            background-color: #334155;
+            border-radius: 3px;
+        }
+
+        .list-item {
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: var(--radius-md);
+            padding: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .list-item:hover {
+            background-color: #1e293b;
+            border-color: var(--primary);
+            transform: translateX(2px);
+        }
+
+        .item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .flag-emoji {
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+
+        .item-title {
+            font-weight: 600;
+            color: #f8fafc;
+            font-size: 0.9375rem;
+        }
+
+        .item-sub {
+            font-size: 0.8125rem;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .latency-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background-color: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .latency-badge.medium {
+            background-color: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .latency-badge.high {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        /* API Tester Console */
+        .api-console {
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: var(--radius-lg);
+            padding: 20px;
+        }
+
+        .endpoint-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .ep-btn {
+            padding: 8px 14px;
+            border-radius: var(--radius-md);
+            font-size: 0.8125rem;
+            font-family: monospace;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid #334155;
+            background-color: #1e293b;
+            color: #cbd5e1;
+            transition: all 0.2s ease;
+        }
+
+        .ep-btn:hover {
+            border-color: var(--primary);
+            color: #ffffff;
+        }
+
+        .ep-btn .method {
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            margin-right: 6px;
+        }
+
+        .ep-btn .get { background-color: #0284c7; color: white; }
+        .ep-btn .post { background-color: #16a34a; color: white; }
+
+        .response-viewer {
+            background-color: #020617;
+            border: 1px solid #1e293b;
+            border-radius: var(--radius-md);
+            padding: 16px;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 0.875rem;
+            color: #38bdf8;
+            max-height: 350px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .response-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #1e293b;
+            font-size: 0.8125rem;
+            color: #94a3b8;
+        }
+
+        /* Toast notification */
+        #toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background-color: #1e293b;
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid #475569;
+            display: none;
+            z-index: 1000;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 16px 12px; }
+            .meta-grid { grid-template-columns: 1fr; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-brand">
+                <span style="font-size: 2rem;">🌐</span>
+                <div>
+                    <h1>VPN Manager Dashboard</h1>
+                    <p>REST API Server & Real-time Client Interface</p>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span class="mode-badge">
+                    <span class="pulse-dot"></span>
+                    <span id="serverModeText">Express API Connected</span>
+                </span>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs" id="navTabs">
+            <button class="tab-btn active" onclick="switchTab('dashboard')">
+                <span>📊 Dashboard</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('servers')">
+                <span>🖥️ VPN Servers (10)</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('countries')">
+                <span>🌍 Countries (10)</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('ips')">
+                <span>🔐 VPN IPs (10)</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('apiTester')">
+                <span>🧪 REST API Console</span>
+            </button>
+        </nav>
+
+        <!-- TAB 1: Main Dashboard -->
+        <div id="tab-dashboard" class="tab-content active">
+            <div class="dashboard-grid">
+                <!-- Status Box Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">📡 Connection Status</h2>
+                        <span id="protocolBadge" style="font-size: 0.75rem; background: #334155; padding: 2px 8px; border-radius: 4px; color: #94a3b8;">WireGuard</span>
+                    </div>
+
+                    <div id="statusBox" class="status-box">
+                        <div id="statusTitle" class="status-title disconnected">
+                            <span>Status: Disconnected</span>
+                        </div>
+                        <div id="statusSub" class="status-sub">Select a server from the list below to establish a secure tunnel.</div>
+                    </div>
+
+                    <div class="meta-grid">
+                        <div class="meta-item">
+                            <div class="meta-label">Assigned VPN IP</div>
+                            <div id="vpnIpVal" class="meta-value">Not Connected</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Active Server</div>
+                            <div id="currentServerVal" class="meta-value">None</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Latency / Ping</div>
+                            <div id="latencyVal" class="meta-value">-- ms</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Encryption</div>
+                            <div id="encryptionVal" class="meta-value">AES-256-GCM</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 10px;">
+                        <button id="disconnectBtn" class="btn btn-danger" onclick="disconnectVPN()" style="display: none;">
+                            <span>⏹ Disconnect VPN</span>
+                        </button>
+                        <button id="quickConnectBtn" class="btn btn-primary" onclick="quickConnect()">
+                            <span>⚡ Quick Connect (Fastest Server)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Featured Servers List -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">🖥️ Top VPN Servers <span class="badge-count">10</span></h2>
+                        <button class="btn btn-outline" style="width: auto; padding: 4px 10px; font-size: 0.75rem;" onclick="fetchServers()">Refresh</button>
+                    </div>
+                    <div id="dashServersList" class="item-list"></div>
+                </div>
+
+                <!-- Featured Countries List -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">🌍 Top Countries <span class="badge-count">10</span></h2>
+                        <button class="btn btn-outline" style="width: auto; padding: 4px 10px; font-size: 0.75rem;" onclick="fetchCountries()">Refresh</button>
+                    </div>
+                    <div id="dashCountriesList" class="item-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: Full Servers View -->
+        <div id="tab-servers" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">🖥️ Available VPN Servers (Top 10)</h2>
+                    <p style="font-size: 0.85rem; color: #94a3b8;">Click any server item to immediately connect</p>
+                </div>
+                <div id="fullServersList" class="item-list" style="max-height: 600px;"></div>
+            </div>
+        </div>
+
+        <!-- TAB 3: Countries View -->
+        <div id="tab-countries" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">🌍 Country Locations (Top 10)</h2>
+                    <p style="font-size: 0.85rem; color: #94a3b8;">10 primary country nodes with flag badges</p>
+                </div>
+                <div id="fullCountriesList" class="item-list" style="max-height: 600px;"></div>
+            </div>
+        </div>
+
+        <!-- TAB 4: VPN IPs View -->
+        <div id="tab-ips" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">🔐 VPN IP Generators (Top 10)</h2>
+                    <p style="font-size: 0.85rem; color: #94a3b8;">Generated IP addresses for top servers</p>
+                </div>
+                <div id="fullIpsList" class="item-list" style="max-height: 600px;"></div>
+            </div>
+        </div>
+
+        <!-- TAB 5: REST API Tester Console -->
+        <div id="tab-apiTester" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">🧪 REST API Route Tester</h2>
+                    <span style="font-size: 0.8125rem; color: #94a3b8;">Test live endpoints & verify JSON payloads</span>
+                </div>
+
+                <div class="endpoint-selector">
+                    <button class="ep-btn" onclick="testEndpoint('GET', '/api/vpn/status')">
+                        <span class="method get">GET</span> /api/vpn/status
+                    </button>
+                    <button class="ep-btn" onclick="testEndpoint('GET', '/api/vpn/servers')">
+                        <span class="method get">GET</span> /api/vpn/servers
+                    </button>
+                    <button class="ep-btn" onclick="testEndpoint('GET', '/api/vpn/servers/flags')">
+                        <span class="method get">GET</span> /api/vpn/servers/flags
+                    </button>
+                    <button class="ep-btn" onclick="testEndpoint('GET', '/api/vpn/countries')">
+                        <span class="method get">GET</span> /api/vpn/countries
+                    </button>
+                    <button class="ep-btn" onclick="testEndpoint('GET', '/api/vpn/countries/flags')">
+                        <span class="method get">GET</span> /api/vpn/countries/flags
+                    </button>
+                    <button class="ep-btn" onclick="testEndpoint('GET', '/api/vpn/ips')">
+                        <span class="method get">GET</span> /api/vpn/ips
+                    </button>
+                    <button class="ep-btn" onclick="testEndpoint('POST', '/api/vpn/connect', { serverId: 1 })">
+                        <span class="method post">POST</span> /api/vpn/connect (Server 1)
+                    </button>
+                    <button class="ep-btn" onclick="testEndpoint('POST', '/api/vpn/disconnect')">
+                        <span class="method post">POST</span> /api/vpn/disconnect
+                    </button>
+                    <button class="ep-btn" onclick="testEndpoint('GET', '/api/health')">
+                        <span class="method get">GET</span> /api/health
+                    </button>
+                </div>
+
+                <div class="api-console">
+                    <div class="response-header">
+                        <span id="resEndpoint">Endpoint: Select above</span>
+                        <span id="resStatus">Status: --</span>
+                    </div>
+                    <pre id="jsonResponse" class="response-viewer">// Click any API endpoint button above to test real-time backend responses...</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast">Notification</div>
+
+    <script>
+        const API_BASE = '/api';
+
+        // Static fallback data for standalone/GitHub Pages preview mode if backend is unreachable
+        const staticFallbackServers = [
+            { id: 1, name: 'US East', country: 'United States', flag: '🇺🇸', ip: '192.168.1.1', city: 'New York', latency: 15 },
+            { id: 2, name: 'US West', country: 'United States', flag: '🇺🇸', ip: '192.168.1.2', city: 'Los Angeles', latency: 25 },
+            { id: 3, name: 'Europe', country: 'Germany', flag: '🇩🇪', ip: '192.168.1.3', city: 'Berlin', latency: 40 },
+            { id: 4, name: 'UK', country: 'United Kingdom', flag: '🇬🇧', ip: '192.168.1.4', city: 'London', latency: 35 },
+            { id: 5, name: 'France', country: 'France', flag: '🇫🇷', ip: '192.168.1.5', city: 'Paris', latency: 38 },
+            { id: 6, name: 'Japan', country: 'Japan', flag: '🇯🇵', ip: '192.168.1.6', city: 'Tokyo', latency: 80 },
+            { id: 7, name: 'Australia', country: 'Australia', flag: '🇦🇺', ip: '192.168.1.7', city: 'Sydney', latency: 150 },
+            { id: 8, name: 'Canada', country: 'Canada', flag: '🇨🇦', ip: '192.168.1.8', city: 'Toronto', latency: 20 },
+            { id: 9, name: 'Singapore', country: 'Singapore', flag: '🇸🇬', ip: '192.168.1.9', city: 'Singapore', latency: 90 },
+            { id: 10, name: 'India', country: 'India', flag: '🇮🇳', ip: '192.168.1.10', city: 'Mumbai', latency: 110 }
+        ];
+
+        const staticFallbackCountries = [
+            { id: 1, name: 'United States', flag: '🇺🇸', servers: 2 },
+            { id: 2, name: 'Germany', flag: '🇩🇪', servers: 1 },
+            { id: 3, name: 'United Kingdom', flag: '🇬🇧', servers: 1 },
+            { id: 4, name: 'France', flag: '🇫🇷', servers: 1 },
+            { id: 5, name: 'Japan', flag: '🇯🇵', servers: 1 },
+            { id: 6, name: 'Australia', flag: '🇦🇺', servers: 1 },
+            { id: 7, name: 'Canada', flag: '🇨🇦', servers: 1 },
+            { id: 8, name: 'Singapore', flag: '🇸🇬', servers: 1 },
+            { id: 9, name: 'India', flag: '🇮🇳', servers: 1 },
+            { id: 10, name: 'Mexico', flag: '🇲🇽', servers: 1 }
+        ];
+
+        let state = {
+            connected: false,
+            currentServer: null,
+            vpnIp: null,
+            isStaticMode: false
+        };
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            const targetTab = document.getElementById(`tab-${tabId}`);
+            if (targetTab) {
+                targetTab.classList.add('active');
+            }
+
+            const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabId));
+            if (activeBtn) activeBtn.classList.add('active');
+        }
+
+        function getLatencyClass(latency) {
+            if (latency < 30) return '';
+            if (latency < 80) return 'medium';
+            return 'high';
+        }
+
+        // Fetch Status
+        async function fetchVpnStatus() {
+            try {
+                const res = await fetch(`${API_BASE}/vpn/status`);
+                if (!res.ok) throw new Error('API request failed');
+                const data = await res.json();
+                state.connected = data.connected;
+                state.currentServer = data.currentServer;
+                state.vpnIp = data.vpnIp;
+                state.isStaticMode = false;
+                document.getElementById('serverModeText').textContent = 'Express API Live';
+                updateStatusUI();
+            } catch (err) {
+                // Fallback for static hosting
+                state.isStaticMode = true;
+                document.getElementById('serverModeText').textContent = 'Static / GitHub Pages Mode';
+                updateStatusUI();
+            }
+        }
+
+        function updateStatusUI() {
+            const statusBox = document.getElementById('statusBox');
+            const statusTitle = document.getElementById('statusTitle');
+            const statusSub = document.getElementById('statusSub');
+            const vpnIpVal = document.getElementById('vpnIpVal');
+            const currentServerVal = document.getElementById('currentServerVal');
+            const latencyVal = document.getElementById('latencyVal');
+            const disconnectBtn = document.getElementById('disconnectBtn');
+            const quickConnectBtn = document.getElementById('quickConnectBtn');
+
+            if (state.connected && state.currentServer) {
+                statusBox.className = 'status-box connected';
+                statusTitle.className = 'status-title connected';
+                statusTitle.innerHTML = `<span>✓ Connected to ${state.currentServer.flag} ${state.currentServer.name}</span>`;
+                statusSub.textContent = `Encrypted tunnel active via ${state.currentServer.city}, ${state.currentServer.country}`;
+                vpnIpVal.textContent = state.vpnIp || state.currentServer.ip;
+                currentServerVal.textContent = `${state.currentServer.flag} ${state.currentServer.name} (${state.currentServer.city})`;
+                latencyVal.textContent = `${state.currentServer.latency} ms`;
+                disconnectBtn.style.display = 'inline-flex';
+                quickConnectBtn.style.display = 'none';
+            } else {
+                statusBox.className = 'status-box';
+                statusTitle.className = 'status-title disconnected';
+                statusTitle.innerHTML = '<span>Status: Disconnected</span>';
+                statusSub.textContent = 'Select a server below or click Quick Connect to activate secure VPN.';
+                vpnIpVal.textContent = 'Not Connected';
+                currentServerVal.textContent = 'None';
+                latencyVal.textContent = '-- ms';
+                disconnectBtn.style.display = 'none';
+                quickConnectBtn.style.display = 'inline-flex';
+            }
+        }
+
+        // Fetch Servers
+        async function fetchServers() {
+            let servers = staticFallbackServers;
+            try {
+                const res = await fetch(`${API_BASE}/vpn/servers/flags`);
+                if (res.ok) {
+                    const data = await res.json();
+                    servers = data.servers;
+                }
+            } catch (e) {}
+
+            renderServersList(servers, 'dashServersList');
+            renderServersList(servers, 'fullServersList');
+        }
+
+        function renderServersList(servers, containerId) {
+            const el = document.getElementById(containerId);
+            if (!el) return;
+            el.innerHTML = servers.map(s => `
+                <div class="list-item" onclick="connectToServer(${s.id})">
+                    <div class="item-left">
+                        <span class="flag-emoji">${s.flag}</span>
+                        <div>
+                            <div class="item-title">${s.name}</div>
+                            <div class="item-sub">${s.city}, ${s.country} • IP: ${s.ip}</div>
+                        </div>
+                    </div>
+                    <span class="latency-badge ${getLatencyClass(s.latency)}">${s.latency} ms</span>
+                </div>
+            `).join('');
+        }
+
+        // Fetch Countries
+        async function fetchCountries() {
+            let countries = staticFallbackCountries;
+            try {
+                const res = await fetch(`${API_BASE}/vpn/countries/flags`);
+                if (res.ok) {
+                    const data = await res.json();
+                    countries = data.countries;
+                }
+            } catch (e) {}
+
+            renderCountriesList(countries, 'dashCountriesList');
+            renderCountriesList(countries, 'fullCountriesList');
+        }
+
+        function renderCountriesList(countries, containerId) {
+            const el = document.getElementById(containerId);
+            if (!el) return;
+            el.innerHTML = countries.map(c => `
+                <div class="list-item" onclick="connectToCountry('${c.name}')">
+                    <div class="item-left">
+                        <span class="flag-emoji">${c.flag}</span>
+                        <div>
+                            <div class="item-title">${c.name}</div>
+                            <div class="item-sub">${c.servers} server node(s) available</div>
+                        </div>
+                    </div>
+                    <span class="badge-count">Connect</span>
+                </div>
+            `).join('');
+        }
+
+        // Fetch VPN IPs
+        async function fetchVpnIps() {
+            let ips = staticFallbackServers.map(s => ({
+                serverId: s.id,
+                serverName: s.name,
+                flag: s.flag,
+                ip: s.ip,
+                country: s.country,
+                city: s.city
+            }));
+
+            try {
+                const res = await fetch(`${API_BASE}/vpn/ips`);
+                if (res.ok) {
+                    const data = await res.json();
+                    ips = data.ips;
+                }
+            } catch (e) {}
+
+            const el = document.getElementById('fullIpsList');
+            if (!el) return;
+            el.innerHTML = ips.map(item => `
+                <div class="list-item" onclick="connectToServer(${item.serverId})">
+                    <div class="item-left">
+                        <span class="flag-emoji">${item.flag}</span>
+                        <div>
+                            <div class="item-title">${item.ip}</div>
+                            <div class="item-sub">${item.serverName} • ${item.city}, ${item.country}</div>
+                        </div>
+                    </div>
+                    <span class="badge-count">Use IP</span>
+                </div>
+            `).join('');
+        }
+
+        // Connect
+        async function connectToServer(serverId) {
+            try {
+                const res = await fetch(`${API_BASE}/vpn/connect`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ serverId })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    state.connected = true;
+                    state.currentServer = data.server;
+                    state.vpnIp = data.vpnIp;
+                    showToast(`Connected to ${data.server.name}`);
+                    updateStatusUI();
+                    return;
+                }
+            } catch (e) {}
+
+            // Static fallback connect logic
+            const s = staticFallbackServers.find(srv => srv.id === serverId) || staticFallbackServers[0];
+            state.connected = true;
+            state.currentServer = s;
+            state.vpnIp = s.ip;
+            showToast(`Connected to ${s.name} (Static)`);
+            updateStatusUI();
+        }
+
+        function connectToCountry(countryName) {
+            const server = staticFallbackServers.find(s => s.country.toLowerCase() === countryName.toLowerCase()) || staticFallbackServers[0];
+            connectToServer(server.id);
+        }
+
+        function quickConnect() {
+            // Find server with lowest latency (US East / Canada / US West)
+            const sorted = [...staticFallbackServers].sort((a, b) => a.latency - b.latency);
+            connectToServer(sorted[0].id);
+        }
+
+        // Disconnect
+        async function disconnectVPN() {
+            try {
+                await fetch(`${API_BASE}/vpn/disconnect`, { method: 'POST' });
+            } catch (e) {}
+
+            state.connected = false;
+            state.currentServer = null;
+            state.vpnIp = null;
+            showToast('Disconnected from VPN');
+            updateStatusUI();
+        }
+
+        // API Tester
+        async function testEndpoint(method, path, body = null) {
+            document.getElementById('resEndpoint').textContent = `Request: ${method} ${path}`;
+            document.getElementById('resStatus').textContent = 'Status: Sending...';
+            document.getElementById('jsonResponse').textContent = 'Loading...';
+
+            try {
+                const options = { method, headers: { 'Content-Type': 'application/json' } };
+                if (body) options.body = JSON.stringify(body);
+
+                const startTime = performance.now();
+                const res = await fetch(path, options);
+                const endTime = performance.now();
+                const duration = Math.round(endTime - startTime);
+
+                const data = await res.json();
+                document.getElementById('resStatus').textContent = `Status: ${res.status} ${res.statusText} (${duration}ms)`;
+                document.getElementById('jsonResponse').textContent = JSON.stringify(data, null, 2);
+            } catch (err) {
+                document.getElementById('resStatus').textContent = 'Status: Fetch Failed (Offline/Static Mode)';
+                document.getElementById('jsonResponse').textContent = JSON.stringify({
+                    error: 'Failed to reach API route on server',
+                    details: err.message,
+                    tip: 'Ensure Node.js server.js is running locally or in Cloud Run'
+                }, null, 2);
+            }
+        }
+
+        // Init
+        async function init() {
+            await fetchVpnStatus();
+            await fetchServers();
+            await fetchCountries();
+            await fetchVpnIps();
+
+            // Auto-refresh status periodically
+            setInterval(fetchVpnStatus, 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

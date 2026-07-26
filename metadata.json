@@ -1,0 +1,8 @@
+{
+  "name": "VPN Manager API & Dashboard",
+  "description": "VPN REST API endpoints with interactive dashboard for status, servers, countries, flags, and VPN IPs",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
