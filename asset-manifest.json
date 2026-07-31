@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/jubilant-octo-bassoon/static/css/main.4ffde262.css",
+    "main.js": "/jubilant-octo-bassoon/static/js/main.43ebefe3.js",
+    "static/js/453.159051cc.chunk.js": "/jubilant-octo-bassoon/static/js/453.159051cc.chunk.js",
+    "index.html": "/jubilant-octo-bassoon/index.html",
+    "main.4ffde262.css.map": "/jubilant-octo-bassoon/static/css/main.4ffde262.css.map",
+    "main.43ebefe3.js.map": "/jubilant-octo-bassoon/static/js/main.43ebefe3.js.map",
+    "453.159051cc.chunk.js.map": "/jubilant-octo-bassoon/static/js/453.159051cc.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.4ffde262.css",
+    "static/js/main.43ebefe3.js"
+  ]
+}
