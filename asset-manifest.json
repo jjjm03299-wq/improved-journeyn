@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/jubilant-octo-bassoon/static/css/main.4ffde262.css",
-    "main.js": "/jubilant-octo-bassoon/static/js/main.43ebefe3.js",
-    "static/js/453.159051cc.chunk.js": "/jubilant-octo-bassoon/static/js/453.159051cc.chunk.js",
-    "index.html": "/jubilant-octo-bassoon/index.html",
-    "main.4ffde262.css.map": "/jubilant-octo-bassoon/static/css/main.4ffde262.css.map",
-    "main.43ebefe3.js.map": "/jubilant-octo-bassoon/static/js/main.43ebefe3.js.map",
-    "453.159051cc.chunk.js.map": "/jubilant-octo-bassoon/static/js/453.159051cc.chunk.js.map"
+    "main.css": "/improved-journeyn/static/css/main.4ffde262.css",
+    "main.js": "/improved-journeyn/static/js/main.3399af06.js",
+    "static/js/453.159051cc.chunk.js": "/improved-journeyn/static/js/453.159051cc.chunk.js",
+    "index.html": "/improved-journeyn/index.html",
+    "main.4ffde262.css.map": "/improved-journeyn/static/css/main.4ffde262.css.map",
+    "main.3399af06.js.map": "/improved-journeyn/static/js/main.3399af06.js.map",
+    "453.159051cc.chunk.js.map": "/improved-journeyn/static/js/453.159051cc.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.4ffde262.css",
-    "static/js/main.43ebefe3.js"
+    "static/js/main.3399af06.js"
   ]
 }
