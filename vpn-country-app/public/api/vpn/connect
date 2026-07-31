@@ -1,0 +1,12 @@
+{
+  "endpoint": "/api/vpn/connect",
+  "method": "POST",
+  "status": "success",
+  "message": "VPN connection established successfully",
+  "data": {
+    "connection_id": "vpn_7c8d9e0f",
+    "connected_at": "2024-07-31T16:00:00Z",
+    "protocol": "OpenVPN",
+    "encryption": "AES-256-GCM"
+  }
+}

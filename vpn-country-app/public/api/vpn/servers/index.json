@@ -1,0 +1,13 @@
+{
+  "endpoint": "/api/vpn/servers",
+  "method": "GET",
+  "status": "success",
+  "data": [
+    { "id": 1, "name": "US-East-1", "load": "45%", "status": "online" },
+    { "id": 2, "name": "UK-London-1", "load": "30%", "status": "online" },
+    { "id": 3, "name": "DE-Frankfurt-1", "load": "60%", "status": "online" },
+    { "id": 4, "name": "JP-Tokyo-1", "load": "25%", "status": "online" },
+    { "id": 5, "name": "SG-Central-1", "load": "15%", "status": "online" },
+    { "id": 6, "name": "AU-Sydney-1", "load": "50%", "status": "online" }
+  ]
+}

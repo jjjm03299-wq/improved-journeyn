@@ -1,0 +1,11 @@
+{
+  "endpoint": "/api/vpn/disconnect",
+  "method": "POST",
+  "status": "success",
+  "message": "VPN disconnected successfully",
+  "data": {
+    "session_duration": "02:15:42",
+    "data_transferred": "154.2 MB",
+    "disconnected_at": "2024-07-31T18:15:42Z"
+  }
+}
